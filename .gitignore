@@ -1,0 +1,5 @@
+.env
+node_modules
+node_modules/*
+constants/firebase-setup.js
+/constants/firebase-setup.js
