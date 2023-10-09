@@ -3,3 +3,5 @@ node_modules
 node_modules/*
 constants/firebase-setup.js
 /constants/firebase-setup.js
+/constants/vericode-bot-firebase-adminsdk-ay60l-dd452d2709.json
+constants/vericode-bot-firebase-adminsdk-ay60l-dd452d2709.json
