@@ -15,7 +15,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 // message event
 client.on("messageCreate", (msg) => {
   if (msg.content === "ping") {
-    msg.reply("t!help");
+    msg.reply("pong");
   }
 });
 
@@ -28,6 +28,8 @@ new CommandHandler({
 
 client.login(process.env.DISCORD_TOKEN);
 
-client.on("ready", () => {
+client.on("ready", async() => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
+
+

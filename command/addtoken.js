@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, GuildChannelManager } = require("discord.js");
-const store = require("../constants/storethings");
 const { client } = require("../constants/allintents");
 
 module.exports = {

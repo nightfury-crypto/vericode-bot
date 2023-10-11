@@ -1,8 +1,10 @@
 const { SlashCommandBuilder, GuildChannelManager } = require("discord.js");
-const store = require("../constants/storethings");
 const { client } = require("../constants/allintents");
 const parse = require("twitter-url-parser");
 const { retriveTweet } = require("../functions/twitterparse");
+const db = require("../constants/firebase-setup");
+const { getChannelsfromDoc } = require("../functions/firefunc");
+const { FieldValue } = require("firebase-admin").firestore;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,17 +21,75 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
+    let streak_mark = 0;
+    // getting channel manager
     const managechannel = new GuildChannelManager(interaction.guild);
     // getting parent channel id
     const parent = await managechannel.fetch(interaction.channelId);
-    const name = interaction.options.getString("content");
+    const userId = interaction.user.id;
+    let isChannelPresent = await getChannelsfromDoc({
+      guildId: interaction.guildId,
+      channelId: interaction.channelId,
+      parentId: parent?.parentId,
+    });
 
-    if (
-      store.channels.includes(parent?.parentId) ||
-      store.channels.includes(interaction.channelId)
-    ) {
+    const name = interaction.options.getString("content");
+    const postingUser = interaction.user.username;
+    if (isChannelPresent) {
+      const { docRef, doc, id } = await retrieveDoc({
+        guildId: interaction.guildId,
+        parentId: parent?.parentId,
+        channelId: interaction.channelId,
+      });
+      if (
+        doc.data()[`${id}`].event_entries[`${userId}`] !== undefined ||
+        doc.data()[`${id}`].event_entries[`${userId}`] !== null
+      ) {
+        const isRegAllowed = doc.data()[`${id}`].lastDateToRegister;
+        const checkLastEntryDate = verifypostdate(
+          doc.data()[`${id}`]?.event_entries[`${userId}`]?.lastEntryDate
+        );
+        const today = verifypostdate(new Date().getTime());
+        streak_mark = doc.data()[`${id}`]?.event_entries[`${userId}`]?.streak;
+
+        if (
+          isRegAllowed.Date >= today.Date &&
+          isRegAllowed.Month >= today.Month &&
+          isRegAllowed.Year >= today.Year
+        ) {
+          return interaction.reply({
+            content: "Registration is closed",
+            ephemeral: true,
+          });
+        } else if (
+          today.date == checkLastEntryDate.date &&
+          today.month == checkLastEntryDate.month &&
+          today.year == checkLastEntryDate.year
+        ) {
+          return interaction.reply({
+            content:
+              "You have already posted today. Your Total Streak is " +
+              streak_mark +
+              ".",
+            ephemeral: true,
+          });
+        } else if (today.date - checkLastEntryDate.date > 1) {
+          return interaction.reply({
+            content: "You have missed a day. Streak broken. Well Tried...",
+            ephemeral: true,
+          });
+        }
+      }
       const checkValidity = await validatemsg(name);
       if (checkValidity) {
+        await addEntry({
+          guildId: interaction.guildId,
+          channelId: id,
+          userId: userId,
+          docRef: docRef,
+          username: postingUser,
+          streak_mark: streak_mark || 0,
+        });
         const msg = await interaction.reply({
           content: name,
           fetchReply: true,
@@ -57,25 +117,11 @@ module.exports = {
 // validate format
 const validatemsg = async (msg) => {
   const link = extractLink(msg);
+
   if (link?.link !== null) {
-    console.log(link);
     return true;
   }
-
-
 };
-
-// const parseUsername = (url) => {
-//   if (url.includes("twitter.com")) {
-//     return url.match(/twitter.com\/(.*)\/status/)[1];
-//   }
-//   if (url.includes("linkedin.com")) {
-//     check = "https://www.linkedin.com/posts/2thless_twitter-logo-using-html-css-ig-https-activity-7097493008421392384-23bF?utm_source=share&utm_medium=member_desktop"
-//     const userstr = check.match(/linkedin\.com\/posts\/([^/?]+)/)[1];
-//     const username = userstr.split("_")[0];
-//     return "2thless_"
-//   }
-// };
 
 const extractLink = (msg) => {
   let link = null;
@@ -89,4 +135,42 @@ const extractLink = (msg) => {
   }
   tweetId = link.match(/\/status\/(\d+)/)[1] || null;
   return { link: link, tweetId: tweetId };
+};
+
+const addEntry = async ({
+  guildId,
+  channelId,
+  userId,
+  username,
+  docRef,
+  streak_mark,
+}) => {
+  // update docs
+  docRef.update({
+    [`${channelId}.event_entries`]: {
+      [`${userId}`]: {
+        userId: userId,
+        username: username,
+        streak: streak_mark + 1,
+        lastEntryDate: new Date().getTime(),
+      },
+    },
+  });
+};
+
+const retrieveDoc = async ({ guildId, parentId, channelId }) => {
+  const docRef = db.collection("events").doc(guildId);
+  const doc = await docRef.get();
+  let id = "";
+
+  if (doc.data()[`${parentId}`]) {
+    id = parentId;
+  } else {
+    id = channelId;
+  }
+  return { docRef: docRef, doc: doc, id: id };
+};
+const verifypostdate = (d) => {
+  const ds = new Date(d);
+  return { date: ds.getDate(), month: ds.getMonth(), year: ds.getFullYear() };
 };
