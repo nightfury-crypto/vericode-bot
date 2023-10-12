@@ -53,11 +53,11 @@ module.exports = {
         streak_mark = doc.data()[`${id}`]?.event_entries[`${userId}`]?.streak;
 
         if (
-          isRegAllowed.Date >= today.Date &&
-          isRegAllowed.Month >= today.Month &&
-          isRegAllowed.Year >= today.Year
+          isRegAllowed.date >= today.date &&
+          isRegAllowed.month >= today.month &&
+          isRegAllowed.year >= today.year
         ) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "Registration is closed",
             ephemeral: true,
           });
@@ -74,12 +74,13 @@ module.exports = {
             ephemeral: true,
           });
         } else if (today.date - checkLastEntryDate.date > 1) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "You have missed a day. Streak broken. Well Tried...",
             ephemeral: true,
           });
         }
       }
+      
       const checkValidity = await validatemsg(name);
       if (checkValidity) {
         await addEntry({
@@ -106,7 +107,7 @@ module.exports = {
         });
       }
     } else {
-      interaction.reply({
+      await interaction.reply({
         content: "cannot use this command here.",
         ephemeral: true,
       });

@@ -2,22 +2,21 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   channelMention,
+  ModalBuilder,
+  TextInputStyle,
+  TextInputBuilder,
+  ActionRowBuilder,
 } = require("discord.js");
 const { client } = require("../constants/allintents");
 const db = require("../constants/firebase-setup");
 const { FieldValue, Timestamp } = require("firebase-admin").firestore;
 const { getChannelsfromDoc } = require("../functions/firefunc");
+const { create_event_modal} = require("../components/EventModal")
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("setauto")
-    .setDescription("set automation")
-    .addStringOption((option) =>
-      option
-        .setName("event_info")
-        .setDescription("['tag1', 'tag2', ...] | start_Date | end_Date | lastDateToRegister")
-        .setRequired(true)
-    )
+    .setName("eventadd")
+    .setDescription("create event")
     .addChannelOption((option) =>
       option.setName("channel_name").setDescription("channel").setRequired(true)
     )
@@ -26,38 +25,88 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
-    const info = interaction.options.getString("event_info").split("|");
-    const eventStartDate = dateFormat(info[1].trim()) || null;
-    const eventEndDate = dateFormat(info[2].trim()) || null;
-    const lastDateToRegister = dateFormat(info[3].trim()) || null;
-    const channelname = interaction.options.getChannel("channel_name");
-    const event_Name = channelname?.name;
-    const channelToMention = channelMention(channelname).slice(2, -1);
-    const isChannelPresent = await getChannelsfromDoc({
-      guildId: interaction.guildId,
-      channelId: channelToMention.slice(2, -1),
-      parentId: null,
-    });
-    if (!isChannelPresent) {
-      createEvent({
-        guildId: interaction.guildId,
-        channelId: channelToMention.slice(2, -1),
-        startDate: eventStartDate,
-        endDate: eventEndDate,
-        eventName: event_Name,
-        lastDateToRegister: lastDateToRegister,
-        event_createdAt: FieldValue.serverTimestamp(),
+    const getModalData = await create_event_modal(interaction);
+    let event_Name = "";
+    let eventStartDate = "";
+    let eventEndDate = "";
+    let lastDateToRegister = "";
+    let tags = "";
+    await interaction.showModal(getModalData);
+    const filter = (interaction) =>
+      interaction.customId === `eventModal-${interaction.user.id}`;
+    interaction
+      .awaitModalSubmit({ filter, time: 10_000 })
+      .then(async (modalinteraction) => {
+        await modalinteraction.deferReply({ ephemeral: true });
+        event_Name =
+          (await modalinteraction.fields.getTextInputValue("event_name_id")) ||
+          null;
+        eventStartDate =
+          dateFormat(
+            await modalinteraction.fields.getTextInputValue("start_date_id")
+          ) || null;
+        eventEndDate =
+          dateFormat(
+            await modalinteraction.fields.getTextInputValue("end_date_id")
+          ) || null;
+        lastDateToRegister =
+          dateFormat(
+            await modalinteraction.fields.getTextInputValue("last_entry_id")
+          ) || null;
+        tags =
+          (await modalinteraction.fields.getTextInputValue("tags_id")) || null;
+        if (
+          eventStartDate === null ||
+          eventEndDate === null ||
+          lastDateToRegister === null ||
+          eventStartDate === NaN ||
+          eventEndDate === NaN ||
+          lastDateToRegister === null ||
+          lastDateToRegister === NaN
+        ) {
+          return await modalinteraction.editReply({
+            content: "Please enter valid date - mm/dd/yyyy",
+            ephemeral: true,
+          });
+        } else if (eventStartDate > eventEndDate) {
+          return await modalinteraction.editReply({
+            content: "Event start date cannot be greater than event end date",
+            ephemeral: true,
+          });
+        } else {
+          const channelname = interaction.options.getChannel("channel_name");
+          const channelToMention = channelMention(channelname).slice(2, -1);
+          const isChannelPresent = await getChannelsfromDoc({
+            guildId: interaction.guildId,
+            channelId: channelToMention.slice(2, -1),
+            parentId: null,
+          });
+          if (!isChannelPresent) {
+            createEvent({
+              guildId: interaction.guildId,
+              channelId: channelToMention.slice(2, -1),
+              startDate: eventStartDate,
+              endDate: eventEndDate,
+              eventName: event_Name,
+              lastDateToRegister: lastDateToRegister,
+              tags: tags !== null ? tags.split(",").map((tag) => tag.trim()) : null,
+              event_createdAt: FieldValue.serverTimestamp(),
+            });
+            await modalinteraction.editReply({
+              content: `Bot added in the ${channelToMention}`,
+              ephemeral: true,
+            });
+          } else {
+            modalinteraction.editReply({
+              content: `Bot already added in the ${channelToMention}`,
+              ephemeral: true,
+            });
+          }
+        }
+      })
+      .catch((err) => {
+        return;
       });
-      interaction.reply({
-        content: `Bot added in the ${channelToMention}`,
-        ephemeral: true,
-      });
-    } else {
-      interaction.reply({
-        content: `Bot already added in the ${channelToMention}`,
-        ephemeral: true,
-      });
-    }
   },
 };
 
@@ -95,7 +144,7 @@ const createEvent = async ({
   startDate,
   endDate,
   eventName,
-  lastDateToRegister
+  lastDateToRegister,
 }) => {
   // read db data from firestore
   const docRef = db.collection("events").doc(guildId);
@@ -126,7 +175,7 @@ const createEvent = async ({
       .collection("events")
       .doc(guildId)
       .set({
-        [`${channelId}`] : {
+        [`${channelId}`]: {
           event_Id: channelId,
           startDate: startDate,
           lastDateToRegister: lastDateToRegister,

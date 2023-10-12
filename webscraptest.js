@@ -1,26 +1,20 @@
-const fs = require('fs');
 const { Tatsu } = require("tatsu");
 
-const token = "nA3DJHOb10-i7XqFFVq8hBxAgKTT4PJF0";
+const token = process.env.TATSU_API_KEY;
 
 const tatsuClient = new Tatsu(token);
 
-let page = 0;
-let shouldContinue = true;
-
-let points = [];
-
-async function fetch_demo(guildId, userId) {
+async function addTokensTatsu({guildId, userId, points}) {
   const guild_id = guildId;
   try {
-	  let addpoints = tatsuClient.addGuildMemberPoints(guild_id, userId, 1).then((res) => {
-		console.log(res);
-	  });
+	  const adding = await tatsuClient.addGuildMemberPoints(guild_id, userId, parseInt(points)).then((res) => res);
+	  if (adding) {
+		return true
+	  }
 	} catch (error) {
 		console.log(error);
+		return false
 	}
-
-
 }
 
-exports.fetch_demo = fetch_demo;
+exports.addTokensTatsu = addTokensTatsu;
