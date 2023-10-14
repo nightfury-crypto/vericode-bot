@@ -6,10 +6,10 @@ const { client } = require("./constants/allintents");
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 // to delete all commands
-  // rest
-  //   .put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
-  //   .then(() => console.log("Successfully deleted all application commands."))
-  //   .catch(console.error);
+// rest
+//   .put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
+//   .then(() => console.log("Successfully deleted all application commands."))
+//   .catch(console.error);
 
 // message event
 client.on("messageCreate", (msg) => {
@@ -21,12 +21,12 @@ client.on("messageCreate", (msg) => {
 // slash command handler
 new CommandHandler({
   client,
-  // eventsPath: path.join(__dirname, "events"),
+  eventsPath: path.join(__dirname, "events"),
   commandsPath: path.join(__dirname, "command"),
 });
 
 client.login(process.env.DISCORD_TOKEN);
 
-client.on("ready", async() => {
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });

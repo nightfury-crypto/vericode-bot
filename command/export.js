@@ -2,7 +2,6 @@ const { SlashCommandBuilder, GuildChannelManager, PermissionFlagsBits } = requir
 const { client } = require("../constants/allintents");
 const db = require("../constants/firebase-setup");
 const fs = require("fs");
-const { Parser } = require("@json2csv/plainjs");
 
 module.exports = {
   data: new SlashCommandBuilder()

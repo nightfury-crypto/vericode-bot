@@ -1,10 +1,10 @@
 const { SlashCommandBuilder, GuildChannelManager } = require("discord.js");
 const { client } = require("../constants/allintents");
-const parse = require("twitter-url-parser");
 const { retriveTweet } = require("../functions/twitterparse");
 const db = require("../constants/firebase-setup");
 const { getChannelsfromDoc } = require("../functions/firefunc");
 const { FieldValue } = require("firebase-admin").firestore;
+const { fetchLinkedin } = require("../functions/linkedinfunc");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -80,9 +80,16 @@ module.exports = {
           });
         }
       }
-      
-      const checkValidity = await validatemsg(name);
-      if (checkValidity) {
+      let validation = false
+      const checkisLinkPresent = isLinkPresent(name);
+      if (checkisLinkPresent?.tweetId && checkisLinkPresent?.link) {
+        validation = true
+      } else if (checkisLinkPresent?.link && checkisLinkPresent?.tweetId === null) {
+        validation = true
+      } else if (checkisLinkPresent === false) {
+        validation = true
+      }
+      if (validation) {
         await addEntry({
           guildId: interaction.guildId,
           channelId: id,
@@ -115,27 +122,34 @@ module.exports = {
     }
   },
 };
-// validate format
-const validatemsg = async (msg) => {
-  const link = extractLink(msg);
 
-  if (link?.link !== null) {
-    return true;
-  }
+const isLinkPresent = (msg) => {
+  console.log(msg);
+  const extract = extractLink(msg);
+  if (extract === null) return false;
+  return extract?.link;
 };
-
 const extractLink = (msg) => {
   let link = null;
   let tweetId = null;
   const startIndex = msg.indexOf("http");
+  if (startIndex === -1) {
+    return null;
+  }
   const endIndex = msg.substring(startIndex, msg.length).indexOf(" ");
   if (endIndex > startIndex) {
     link = msg.substring(startIndex, endIndex + startIndex).trim();
   } else {
     link = msg.substring(startIndex, msg.length).trim();
   }
-  tweetId = link.match(/\/status\/(\d+)/)[1] || null;
-  return { link: link, tweetId: tweetId };
+  if (link.includes("linkedin.com")) {
+    return { link: link, tweetId: null };
+  } else if (link.includes("twitter.com")) {
+    tweetId = link.match(/\/status\/(\d+)/)[1] || null;
+    return { link: link, tweetId: tweetId };
+  } else {
+    return null;
+  }
 };
 
 const addEntry = async ({
