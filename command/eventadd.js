@@ -25,18 +25,22 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
-    const getModalData = await create_event_modal(interaction);
+    const customId = `eventModal-${interaction.user.id}`;
     let event_Name = "";
     let eventStartDate = "";
     let eventEndDate = "";
     let lastDateToRegister = "";
     let tags = "";
+    const getModalData = await create_event_modal({eventName: event_Name, eStartDate: eventStartDate, eEndDate: eventEndDate, eLastDate: lastDateToRegister, eTags: tags, userId: interaction.user.id});
+
     await interaction.showModal(getModalData);
-    const filter = (interaction) =>
-      interaction.customId === `eventModal-${interaction.user.id}`;
+    const filter = (interaction) => 
+      customId === `eventModal-${interaction.user.id}`;
     interaction
-      .awaitModalSubmit({ filter, time: 10_000 })
+      .awaitModalSubmit({ filter, time: 90_000 })
       .then(async (modalinteraction) => {
+        
+        if (modalinteraction.isModalSubmit()) {
         await modalinteraction.deferReply({ ephemeral: true });
         event_Name =
           (await modalinteraction.fields.getTextInputValue("event_name_id")) ||
@@ -54,7 +58,7 @@ module.exports = {
             await modalinteraction.fields.getTextInputValue("last_entry_id")
           ) || null;
         tags =
-          (await modalinteraction.fields.getTextInputValue("tags_id")) || null;
+          (await modalinteraction.fields.getTextInputValue("tags_id")) || "";
         if (
           eventStartDate === null ||
           eventEndDate === null ||
@@ -89,7 +93,7 @@ module.exports = {
               endDate: eventEndDate,
               eventName: event_Name,
               lastDateToRegister: lastDateToRegister,
-              tags: tags !== null ? tags.split(",").map((tag) => tag.trim()) : null,
+              tags: tags,
               event_createdAt: FieldValue.serverTimestamp(),
             });
             await modalinteraction.editReply({
@@ -103,6 +107,9 @@ module.exports = {
             });
           }
         }
+      } else {
+        return;
+      }
       })
       .catch((err) => {
         return;
@@ -145,6 +152,7 @@ const createEvent = async ({
   endDate,
   eventName,
   lastDateToRegister,
+  tags,
 }) => {
   // read db data from firestore
   const docRef = db.collection("events").doc(guildId);
@@ -161,6 +169,7 @@ const createEvent = async ({
           endDate: endDate,
           eventName: eventName,
           event_entries: [],
+          tags: tags,
           created_at: Timestamp.fromDate(new Date()),
         },
       })
@@ -182,6 +191,7 @@ const createEvent = async ({
           endDate: endDate,
           eventName: eventName,
           event_entries: [],
+          tags: tags,
           created_at: Timestamp.fromDate(new Date()),
         },
       })

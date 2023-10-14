@@ -26,7 +26,6 @@ module.exports = {
       channelId: channel.id,
     });
     if (data !== null) {
-      console.log(data)
       const event_total_days = calculateDate(data.startDate, data.endDate);
       if (Object.keys(data?.event_entries).length > 0) {
         for (const userId in data.event_entries) {  

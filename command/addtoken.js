@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, GuildChannelManager } = require("discord.js");
 const { client } = require("../constants/allintents");
 const fs = require("fs");
-const {addTokensTatsu} = require("../webscraptest.js")
+const {addTokensTatsu} = require("../functions/webscraptest")
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("addtoken")
@@ -31,7 +31,6 @@ module.exports = {
 
       if (status == "not eligible") {
         let isAdded = await addTokensTatsu({guildId: guildId, userId: userId, points: points});
-        console.log(isAdded)
         count++
       }
     }

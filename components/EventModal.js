@@ -5,9 +5,9 @@ const {
     ActionRowBuilder,
   } = require("discord.js");
 
-const create_event_modal = async (interaction) => {
+const create_event_modal = async ({eventName, eStartDate, eEndDate, eLastDate, eTags, userId}) => {
   const modal = new ModalBuilder()
-    .setCustomId(`eventModal-${interaction.user.id}`)
+    .setCustomId(`eventModal-${userId}`)
     .setTitle("Create Event");
 
   // Create the text input components
@@ -15,6 +15,7 @@ const create_event_modal = async (interaction) => {
     .setCustomId("event_name_id")
     .setLabel("Event Name")
     .setPlaceholder("scaler-event")
+    .setValue(eventName)
     .setStyle(TextInputStyle.Short)
     .setRequired(true);
 
@@ -22,6 +23,7 @@ const create_event_modal = async (interaction) => {
     .setCustomId("start_date_id")
     .setLabel("Event Start Date (mm/dd/yyyy)")
     .setPlaceholder("mm/dd/yyyy")
+    .setValue(eStartDate)
     .setStyle(TextInputStyle.Short)
     .setRequired(true);
 
@@ -29,6 +31,7 @@ const create_event_modal = async (interaction) => {
     .setCustomId("end_date_id")
     .setLabel("Event End Date (mm/dd/yyyy)")
     .setPlaceholder("mm/dd/yyyy")
+    .setValue(eEndDate)
     .setStyle(TextInputStyle.Short)
     .setRequired(true);
 
@@ -36,13 +39,15 @@ const create_event_modal = async (interaction) => {
     .setCustomId("last_entry_id")
     .setLabel("Registration last date (mm/dd/yyyy)")
     .setPlaceholder("mm/dd/yyyy")
+    .setValue(eLastDate)
     .setStyle(TextInputStyle.Short)
     .setRequired(true);
 
   const tagsInput = new TextInputBuilder()
     .setCustomId("tags_id")
     .setLabel("Keywords (comma separated)")
-    .setPlaceholder("twitter.com, #ScalerDiscord, #ScalerAcademy...")
+    .setPlaceholder("scaler, #ScalerDiscord, #ScalerAcademy...")
+    .setValue(eTags)
     .setStyle(TextInputStyle.Short)
     .setRequired(false);
 

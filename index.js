@@ -3,7 +3,6 @@ const { dotenv } = require("dotenv/config");
 const path = require("path");
 const { CommandHandler } = require("djs-commander");
 const { client } = require("./constants/allintents");
-const { fetch_demo } = require("./webscraptest");
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 // to delete all commands
@@ -31,5 +30,3 @@ client.login(process.env.DISCORD_TOKEN);
 client.on("ready", async() => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
-
-
