@@ -83,10 +83,25 @@ This command is used to post the content to maintain their streaks according to 
     TATSU_API_KEY = <tatsu api>
     APIFY_API_KEY = <apify api>
     ``` 
+3. **Create `firebase-setup.js` file inside `./constants/firebase-setup`**
 
-3. run the command
+    ```
+    const admin = require("firebase-admin")
+
+    const serviceAccount = require("<firebase-adminsdk.json />");
+
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+
+    const db = admin.firestore()
+
+    module.exports = db;
+    ``` 
+
+4. run the command
     ```
     npm install
     npm run dev
     ```
-
+    
