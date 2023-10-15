@@ -57,3 +57,26 @@ This command is used to post the content to maintain their streaks according to 
 
 `These are just few features of this bot: more will come.`
 
+### 🛠️ Installation & Setup
+
+1. **Clone the Repository**
+   ```sh
+   git clone https://github.com/nightfury-crypto/vericode-bot.git
+   cd vericode-bot
+2. **Create .env file in root directory**
+
+    ```
+    DISCORD_TOKEN = <discord token>
+    CLIENT_ID = <client id>
+    CLIENT_SECRET = <client secret>
+
+    TATSU_API_KEY = <tatsu api>
+    APIFY_API_KEY = <apify api>
+    ``` 
+
+3. run the command
+    ```
+    npm install
+    npm run dev
+    ```
+
