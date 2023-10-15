@@ -7,6 +7,7 @@
 
 ![vericodebot](https://github.com/nightfury-crypto/vericode-bot/blob/main/assets/display-readme/botprofile.png?raw=true)
 `
+
 A Discord bot designed for automating the process of challenges or events within the Discord server. This bot can handle users streaks, create/update/delete an event, verify user post and also export the user entries of an event in a csv file along with tokens distribution. 
 `
 ### NEED ?
@@ -15,9 +16,11 @@ Manually track the event or event posts of so many participants is a time taking
 
 ## VeriCode Bot Features/Commands.
 
-Commands - 
+**Slash Commands -** 
 
 `/help` - This command will DM the user about the bot commands with their usage.
+
+![help](https://github.com/nightfury-crypto/vericode-bot/blob/main/assets/display-readme/helpdm.png?raw=true)
 
 ```
 Admin or Moderator
