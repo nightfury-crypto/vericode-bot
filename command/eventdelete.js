@@ -19,6 +19,7 @@ const {
       ),
   
     run: async ({ interaction }) => {
+      if (!interaction.isChatInputCommand()) return;
       let store = null;
 
       const channelname = interaction.options.getChannel("channel_name");

@@ -20,6 +20,7 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
+    if (!interaction.isChatInputCommand()) return;
     let store = null;
     const customId = `eventModal-${interaction.user.id}`;
     let event_Name = "";

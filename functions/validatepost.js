@@ -4,8 +4,12 @@ const {fetchTweet} = require("../functions/twitterparse")
 const {fetchLinkedin} = require("../functions/linkedinfunc")
 
 const validatePost = async ({post, tags}) => {
+    let postLink = post?.link;
     if (post?.link && post?.tweetId) {
-        return await validateTwitterLinkPost({tweet: post, tags});
+        if (post?.link.includes("x.com")) {
+            postLink = postLink.replace("x.com", "twitter.com");
+        }
+        return await validateTwitterLinkPost({tweet: postLink, tags});
     }
     if (post?.link && !post?.tweetId) {
         return await validateLinkedinLinkPost({linkedin: post?.link, tags});
@@ -20,7 +24,7 @@ const validatePost = async ({post, tags}) => {
 
 const validateTwitterLinkPost = async ({tweet, tags}) => {
     const tagsArr = tags.split(",");
-    const content = await fetchTweet({url: tweet?.link});
+    const content = await fetchTweet({url: tweet});
     if (content.trim() !== "") {
         if (tagsArr.every((tag) => content.includes(tag))) {
             return true;

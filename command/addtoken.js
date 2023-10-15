@@ -26,6 +26,7 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
+    if (!interaction.isChatInputCommand()) return;
     await interaction.deferReply();
     const guildId = interaction.guild.id;
     const points = interaction.options.getString("points");

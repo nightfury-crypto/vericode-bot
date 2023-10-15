@@ -18,6 +18,7 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
+    if (!interaction.isChatInputCommand()) return;
     const channel = interaction.options.getChannel("channel");
     let csvData = ["id", "username", "streak", "eligible status", "points added\n"];
     const data = await retrieveData({

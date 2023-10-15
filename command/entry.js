@@ -18,6 +18,8 @@ module.exports = {
     ),
 
   run: async ({ interaction }) => {
+    if (!interaction.isChatInputCommand()) return;
+    await interaction.deferReply();
     let streak_mark = 0;
     // getting channel manager
     const managechannel = new GuildChannelManager(interaction.guild);
@@ -54,7 +56,7 @@ module.exports = {
           isRegAllowed.month >= today.month &&
           isRegAllowed.year >= today.year
         ) {
-          return await interaction.reply({
+          return await interaction.editReply({
             content: "Registration is closed",
             ephemeral: true,
           });
@@ -63,7 +65,7 @@ module.exports = {
           today.month == checkLastEntryDate.month &&
           today.year == checkLastEntryDate.year
         ) {
-          return interaction.reply({
+          return interaction.editReply({
             content:
               "You have already posted today. Your Total Streak is " +
               streak_mark +
@@ -71,13 +73,12 @@ module.exports = {
             ephemeral: true,
           });
         } else if (today.date - checkLastEntryDate.date > 1) {
-          return await interaction.reply({
+          return await interaction.editReply({
             content: "You have missed a day. Streak broken. Well Tried...",
             ephemeral: true,
           });
         }
       }
-      await interaction.deferReply();
       let validation = false;
       const checkisLinkPresent = isLinkPresent(name);
       if (!checkisLinkPresent?.link && isSocial === true) {
@@ -146,7 +147,7 @@ module.exports = {
         });
       }
     } else {
-      await interaction.reply({
+      await interaction.editReply({
         content: "cannot use this command here.",
         ephemeral: true,
       });
