@@ -130,7 +130,7 @@ module.exports = {
           username: postingUser,
           streak_mark: streak_mark || 0,
         });
-        let msg = null
+        let msg = null;
         if (file === null) {
           msg = await interaction.editReply({
             content: `${name}`,
