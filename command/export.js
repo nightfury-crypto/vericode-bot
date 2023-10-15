@@ -19,6 +19,7 @@ module.exports = {
 
   run: async ({ interaction }) => {
     if (!interaction.isChatInputCommand()) return;
+    await interaction.deferReply();
     const channel = interaction.options.getChannel("channel");
     let csvData = ["id", "username", "streak", "eligible status", "points added\n"];
     const data = await retrieveData({
@@ -40,12 +41,12 @@ module.exports = {
           csvData += rowData.join(",") + "\n";
         }
         fs.writeFileSync("output.csv", csvData);
-        await interaction.reply({ content: "file exported", files: ["output.csv"] });
+        await interaction.editReply({ content: "file exported", files: ["output.csv"] });
       } else {
-        await interaction.reply({ content: "No entries", ephemeral: true });
+        await interaction.editReply({ content: "No entries", ephemeral: true });
       }
     } else {
-      await interaction.reply({ content: "No event from this channel", ephemeral: true });
+      await interaction.editReply({ content: "No event from this channel", ephemeral: true });
     }
     
   },

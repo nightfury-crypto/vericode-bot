@@ -4,8 +4,7 @@ const {
     channelMention,
   } = require("discord.js");
   const db = require("../constants/firebase-setup");
-  const { FieldValue, Timestamp } = require("firebase-admin").firestore;
-  const { create_event_modal } = require("../components/EventModal");
+  const { FieldValue } = require("firebase-admin").firestore;
   
   module.exports = {
     data: new SlashCommandBuilder()
@@ -20,6 +19,7 @@ const {
   
     run: async ({ interaction }) => {
       if (!interaction.isChatInputCommand()) return;
+      await interaction.deferReply();
       let store = null;
 
       const channelname = interaction.options.getChannel("channel_name");
@@ -41,12 +41,12 @@ const {
                     });
 
                     if (isdeleted) {
-                        return await interaction.reply({
+                        return await interaction.editReply({
                         content: "Event deleted successfully",
                         ephemeral: true,
                         });
                     } else {
-                        return await interaction.reply({
+                        return await interaction.editReply({
                         content: "Event not deleted",
                         ephemeral: true,
                         });
@@ -56,13 +56,13 @@ const {
                 store = null;
             }
       } else {
-          return await interaction.reply({
+          return await interaction.editReply({
               content: "No event to delete. Please create event first using\n `/eventadd --channel_name <channel>`",
               ephemeral: true,
             });
       }
       if (store == undefined || store == null) {
-        return await interaction.reply({
+        return await interaction.editReplyeply({
           content: "No event from this channel",
           ephemeral: true,
         });
