@@ -66,6 +66,12 @@ module.exports = {
           value:
             "To export all entries of an event into csv file. Admin or moderator only",
         inline: true,
+        },
+        {
+          name: "`/mystreak`",
+          value:
+            "To check your progress. @everyone can use this command",
+        inline: true,
         }
       )
       .setTimestamp(new Date())
