@@ -28,30 +28,30 @@ Admin or Moderator
 
 **- [ I ]**  `/eventadd` - This will take 2 arguments **--channelId** and **--isSocialLink**.
 
-`This command is used to create a new event. The event ID is equal to the channel ID. and isSocial is just a boolean option true/false.(whether twitter/linkedin post link is required or not.). Remember isSocial once set cannot be changed. After that a modal will open to fill the event details.`
+This command is used to create a new event. The event ID is equal to the channel ID. and isSocial is just a boolean option true/false.(whether twitter/linkedin post link is required or not.). Remember isSocial once set cannot be changed. After that a modal will open to fill the event details.
 
 **- [ II ]**  `/eventupdate` - This will take 1 argument **--channelId**
 
-`This command is used to update the event. The event ID is equal to the channel ID. After that a modal will open to update the event details`
+This command is used to update the event. The event ID is equal to the channel ID. After that a modal will open to update the event details
 
 **- [ III ]**  `/eventdelete` - This will take 1 argument **--channelId**
 
-`This command is used to delete the event. The event ID is equal to the channel ID.`
+This command is used to delete the event. The event ID is equal to the channel ID.
 
 **- [ IV ]**  `/export` - This will take 1 argument **--channelId**
 
-`This command is used to export the event entries of users in a csv file. This csv file will contain ["user_id", "username", "streaks", "eligibile status"] details. Which can be used for the automation of token distribution. The event ID is equal to the channel ID.`
+This command is used to export the event entries of users in a csv file. This csv file will contain ["user_id", "username", "streaks", "eligibile status"] details. Which can be used for the automation of token distribution. The event ID is equal to the channel ID.
 
 **- [ V ]**  `/addtoken` - This will take 2 argument **--channelId** and **--attachment_csvfile**
 
-`This command is used to add tokens to the users from the csv file according to their eligibility criteria. This csv file will contain ["user_id", "username", "streaks", "eligibile status"] details. After the process it will give information about the successfull and failed token distribution in 2 separate files. The event ID is equal to the channel ID.`
+This command is used to add tokens to the users from the csv file according to their eligibility criteria. This csv file will contain ["user_id", "username", "streaks", "eligibile status"] details. After the process it will give information about the successfull and failed token distribution in 2 separate files. The event ID is equal to the channel ID.
 
 ```
 participants (@everyone)
 ```
 **- [ I ]**  `/entry` - This will take 2 argument **--content** and **--attachments** *(optional)*
 
-`This command is used to post the content to maintain their streaks according to the format provided.`
+This command is used to post the content to maintain their streaks according to the format provided.
 *(Note: use this command inside the event channel only. It is channel specific and event specific only.)*
 
 
