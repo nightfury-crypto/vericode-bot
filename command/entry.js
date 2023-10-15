@@ -111,7 +111,6 @@ module.exports = {
       } else if (checkisLinkPresent === false) {
         const tagsArr = tags.split(",");
         if (name.trim() !== "" && tagsArr.length > 0) {
-          console.log(tagsArr);
           if (tagsArr.every((tag) => name.includes(tag))) {
             validation = true;
           } else {
@@ -122,6 +121,7 @@ module.exports = {
         }
       }
       if (validation) {
+        const file = interaction.options.getAttachment("attachment");
         await addEntry({
           guildId: interaction.guildId,
           channelId: id,
@@ -130,10 +130,18 @@ module.exports = {
           username: postingUser,
           streak_mark: streak_mark || 0,
         });
-        const msg = await interaction.editReply({
-          content: name,
-          fetchReply: true,
-        });
+        let msg = null
+        if (file === null) {
+          msg = await interaction.editReply({
+            content: `${name}`,
+            fetchReply: true,
+          });
+        } else {
+          msg = await interaction.editReply({
+            content: `${name} ${file?.attachment}`,
+            fetchReply: true,
+          });
+        }
         msg.react("✅");
         await interaction.followUp({
           content: "entry added Successfully ✅!",
@@ -166,7 +174,6 @@ const extractLink = (msg) => {
   let tweetId = null;
   const startIndex = msg.indexOf("http");
   if (startIndex === -1) {
-    console.log("no link");
     return null;
   }
   const endIndex = msg.substring(startIndex, msg.length).indexOf(" ");

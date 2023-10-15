@@ -13,6 +13,9 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 // message event
 client.on("messageCreate", (msg) => {
+  // console.log(msg)
+  // msg.reply(msg.attachments.each((attachment) => attachment
+  // ));
   if (msg.content === "ping") {
     msg.reply("pong");
   }

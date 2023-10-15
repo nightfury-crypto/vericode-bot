@@ -9,7 +9,6 @@ async function fetchLinkedin({url}) {
         const $ = cheerio.load(response.data);
 
         fullText += $("title").text();
-        console.log(fullText);
         
         return fullText;
       } else {
