@@ -34,6 +34,13 @@ This command is used to create a new event. The event ID is equal to the channel
 
 This command is used to update the event. The event ID is equal to the channel ID. After that a modal will open to update the event details
 
+---
+create and update both having modal functionality
+
+![create](https://github.com/nightfury-crypto/vericode-bot/blob/main/assets/display-readme/create.png?raw=true) 
+
+---
+
 **- [ III ]**  `/eventdelete` - This will take 1 argument **--channelId**
 
 This command is used to delete the event. The event ID is equal to the channel ID.
