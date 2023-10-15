@@ -20,6 +20,12 @@ module.exports = {
     .addChannelOption((option) =>
       option.setName("channel_name").setDescription("channel").setRequired(true)
     )
+    .addBooleanOption((option) =>
+      option
+        .setName("social_post_bool")
+        .setDescription("Twitter or Linkedin post link required? true/false | Once set, cannot be changed")
+        .setRequired(true)
+    )
     .setDefaultMemberPermissions(
       PermissionFlagsBits.Administrator || PermissionFlagsBits.ModerateMembers
     ),
@@ -31,7 +37,9 @@ module.exports = {
     let eventEndDate = "";
     let lastDateToRegister = "";
     let tags = "";
-    const getModalData = await create_event_modal({eventName: event_Name, eStartDate: eventStartDate, eEndDate: eventEndDate, eLastDate: lastDateToRegister, eTags: tags, userId: interaction.user.id});
+    let isSocial = false
+    isSocial = interaction.options.getBoolean("social_post_bool");
+    const getModalData = await create_event_modal({eventName: event_Name, eStartDate: eventStartDate, eEndDate: eventEndDate, eLastDate: lastDateToRegister, eTags: tags, userId: interaction.user.id, title: "Create"});
 
     await interaction.showModal(getModalData);
     const filter = (interaction) => 
@@ -94,6 +102,7 @@ module.exports = {
               eventName: event_Name,
               lastDateToRegister: lastDateToRegister,
               tags: tags,
+              isSocial: isSocial,
               event_createdAt: FieldValue.serverTimestamp(),
             });
             await modalinteraction.editReply({
@@ -153,6 +162,7 @@ const createEvent = async ({
   eventName,
   lastDateToRegister,
   tags,
+  isSocial,
 }) => {
   // read db data from firestore
   const docRef = db.collection("events").doc(guildId);
@@ -170,6 +180,7 @@ const createEvent = async ({
           eventName: eventName,
           event_entries: [],
           tags: tags,
+          isSocial: isSocial,
           created_at: Timestamp.fromDate(new Date()),
         },
       })
@@ -192,6 +203,7 @@ const createEvent = async ({
           eventName: eventName,
           event_entries: [],
           tags: tags,
+          isSocial: isSocial,
           created_at: Timestamp.fromDate(new Date()),
         },
       })

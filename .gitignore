@@ -6,3 +6,8 @@ constants/firebase-setup.js
 /constants/vericode-bot-firebase-adminsdk-ay60l-dd452d2709.json
 constants/vericode-bot-firebase-adminsdk-ay60l-dd452d2709.json
 output.csv
+/output.csv
+success.csv
+/success.csv
+fail.csv
+/fail.csv

@@ -1,10 +1,7 @@
 const { SlashCommandBuilder, GuildChannelManager } = require("discord.js");
-const { client } = require("../constants/allintents");
-const { retriveTweet } = require("../functions/twitterparse");
 const db = require("../constants/firebase-setup");
 const { getChannelsfromDoc } = require("../functions/firefunc");
-const { FieldValue } = require("firebase-admin").firestore;
-const { fetchLinkedin } = require("../functions/linkedinfunc");
+const { validatePost } = require("../functions/validatepost");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -36,7 +33,7 @@ module.exports = {
     const name = interaction.options.getString("content");
     const postingUser = interaction.user.username;
     if (isChannelPresent) {
-      const { docRef, doc, id } = await retrieveDoc({
+      const { docRef, doc, id, tags, isSocial } = await retrieveDoc({
         guildId: interaction.guildId,
         parentId: parent?.parentId,
         channelId: interaction.channelId,
@@ -80,14 +77,48 @@ module.exports = {
           });
         }
       }
-      let validation = false
+      await interaction.deferReply();
+      let validation = false;
       const checkisLinkPresent = isLinkPresent(name);
+      if (!checkisLinkPresent?.link && isSocial === true) {
+        return await interaction.editReply({
+          content:
+            "❌invalid format! entry not added.❌\n ----------------------------------\nPlease submit **twitter** or **linkedin** post link for the verification.\n ----------------------------------\n",
+          ephemeral: true,
+        });
+      }
       if (checkisLinkPresent?.tweetId && checkisLinkPresent?.link) {
-        validation = true
-      } else if (checkisLinkPresent?.link && checkisLinkPresent?.tweetId === null) {
-        validation = true
+        validation = await validatePost({
+          post: {
+            link: checkisLinkPresent?.link,
+            tweetId: checkisLinkPresent?.tweetId,
+          },
+          tags: tags,
+        });
+      } else if (
+        checkisLinkPresent?.link !== null &&
+        checkisLinkPresent?.link?.includes("linkedin") &&
+        checkisLinkPresent?.tweetId === null
+      ) {
+        validation = await validatePost({
+          post: {
+            link: checkisLinkPresent?.link,
+            tweetId: checkisLinkPresent?.tweetId,
+          },
+          tags: tags,
+        });
       } else if (checkisLinkPresent === false) {
-        validation = true
+        const tagsArr = tags.split(",");
+        if (name.trim() !== "" && tagsArr.length > 0) {
+          console.log(tagsArr);
+          if (tagsArr.every((tag) => name.includes(tag))) {
+            validation = true;
+          } else {
+            validation = false;
+          }
+        } else {
+          validation = false;
+        }
       }
       if (validation) {
         await addEntry({
@@ -98,7 +129,7 @@ module.exports = {
           username: postingUser,
           streak_mark: streak_mark || 0,
         });
-        const msg = await interaction.reply({
+        const msg = await interaction.editReply({
           content: name,
           fetchReply: true,
         });
@@ -108,8 +139,9 @@ module.exports = {
           ephemeral: true,
         });
       } else {
-        await interaction.reply({
-          content: "invalid format! entry not added.",
+        await interaction.editReply({
+          content:
+            "❌invalid format! Please check hashtags. entry not added.❌",
           ephemeral: true,
         });
       }
@@ -124,16 +156,16 @@ module.exports = {
 };
 
 const isLinkPresent = (msg) => {
-  console.log(msg);
   const extract = extractLink(msg);
   if (extract === null) return false;
-  return extract?.link;
+  return extract;
 };
 const extractLink = (msg) => {
   let link = null;
   let tweetId = null;
   const startIndex = msg.indexOf("http");
   if (startIndex === -1) {
+    console.log("no link");
     return null;
   }
   const endIndex = msg.substring(startIndex, msg.length).indexOf(" ");
@@ -142,10 +174,13 @@ const extractLink = (msg) => {
   } else {
     link = msg.substring(startIndex, msg.length).trim();
   }
-  if (link.includes("linkedin.com")) {
+  if (link?.includes("linkedin.com")) {
     return { link: link, tweetId: null };
-  } else if (link.includes("twitter.com")) {
+  } else if (link.includes("twitter.com") || link.includes("x.com")) {
     tweetId = link.match(/\/status\/(\d+)/)[1] || null;
+    if (tweetId === null) {
+      return null;
+    }
     return { link: link, tweetId: tweetId };
   } else {
     return null;
@@ -183,7 +218,13 @@ const retrieveDoc = async ({ guildId, parentId, channelId }) => {
   } else {
     id = channelId;
   }
-  return { docRef: docRef, doc: doc, id: id };
+  return {
+    docRef: docRef,
+    doc: doc,
+    id: id,
+    tags: doc.data()[`${id}`].tags,
+    isSocial: doc.data()[`${id}`].isSocial,
+  };
 };
 const verifypostdate = (d) => {
   const ds = new Date(d);

@@ -5,10 +5,10 @@ const {
     ActionRowBuilder,
   } = require("discord.js");
 
-const create_event_modal = async ({eventName, eStartDate, eEndDate, eLastDate, eTags, userId}) => {
+const create_event_modal = async ({eventName, eStartDate, eEndDate, eLastDate, eTags, userId, title}) => {
   const modal = new ModalBuilder()
     .setCustomId(`eventModal-${userId}`)
-    .setTitle("Create Event");
+    .setTitle(`${title} Event`);
 
   // Create the text input components
   const eventNameInput = new TextInputBuilder()

@@ -5,12 +5,14 @@ const { AttachmentBuilder, EmbedBuilder } = require("discord.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("help")
-    .setDescription("this will dm you info about bot and its commands"),
+    .setDescription("this will dm you info about bot and its commands")
+    .setDMPermission(true),
 
   run: async ({ interaction }) => {
     if (!interaction.isChatInputCommand()) return;
     await interaction.deferReply({
       content: "wearing shoes.. coming",
+        ephemeral: true,
     });
     const customembed = new EmbedBuilder()
       // embed
@@ -23,48 +25,56 @@ module.exports = {
         name: `karnail Singh Choudhary`,
         iconURL: 'https://cdn.discordapp.com/avatars/532471253349564417/2dc4188b09760a470a01ef5b78da2e7b.webp?size=160',
       })
-      .setDescription('I am not a bot, I am a human with some superpowers. A can manage your events, entries and tokens distribution.')
-      .setThumbnail('https://cdn5.vectorstock.com/i/1000x1000/34/89/qr-code-icon-black-scan-logo-barcode-vector-40743489.jpg')
+      .setDescription('I am not a bot, I am a human with some superpowers. I can manage your events, entries and tokens distribution.')
+      .setThumbnail('https://raw.githubusercontent.com/nightfury-crypto/vericode-bot/main/assets/img/logo2.jpeg')
       .addFields(
         { name: "\u200B", value: "\u200B" },
-        { name: `**🔥About my COMMANDS🔥**`, value: "\u200B" }
+        { name: `**🔥MY COMMANDS🔥**`, value: "\u200B" }
       )
       .addFields(
         {
-          name: "**/eventadd --channel_name**",
+          name: "`/eventadd `",
           value: "To create an event. Admin or moderator only",
+          inline: true,
         },
         {
-          name: "**/eventupdate --channel_name**",
+          name: "`/eventupdate `",
           value: "To update an event. Admin or moderator only",
+        inline: true,
         },
+        { name: "\u200B", value: "\u200B" },
         {
-          name: "**/eventdelete --channel_name**",
+          name: "`/eventdelete `",
           value: "To delete an event. Admin or moderator only",
+        inline: true,
         },
         {
-          name: "**/entry --content**",
+          name: "`/entry `",
           value:
             "To enter an event and to post entries. Everyone can use this command [participants]",
+        inline: true,
         },
+        { name: "\u200B", value: "\u200B" },
         {
-          name: "**/addtoken --points --csv_file**",
+          name: "`/addtoken`",
           value:
             "To add tokens to users. Admin or moderator only having guildmanager role",
+        inline: true,
         },
         {
-          name: "**/export --channel_name**",
+          name: "`/export`",
           value:
             "To export all entries of an event into csv file. Admin or moderator only",
+        inline: true,
         }
       )
-      .setImage('https://archive.smashing.media/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/d0a4481f-e801-4cb7-9daa-17cdae32cc89/icon-design-21-opt.png')
-      .setTimestamp()
+      .setTimestamp(new Date())
       .setFooter({
         text: `ig_toothless__`,
-        iconURL: 'https://archive.smashing.media/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/d0a4481f-e801-4cb7-9daa-17cdae32cc89/icon-design-21-opt.png',
+        iconURL: 'https://cdn.discordapp.com/avatars/532471253349564417/2dc4188b09760a470a01ef5b78da2e7b.webp?size=160',
       });
     // embed ends here
-    await interaction.editReply({ embeds: [customembed] });
+    await interaction.user.send({ embeds: [customembed] });
+    await interaction.editReply({ content: "check your dm", ephemeral: true });
   },
 };

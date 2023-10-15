@@ -66,6 +66,7 @@ module.exports = {
       eEndDate: eventEndDate.toString(),
       eLastDate: lastDateToRegister.toString(),
       eTags: tags,
+      title: "Update",
     });
     await interaction.showModal(getModalData);
     const filter = (interaction) =>
