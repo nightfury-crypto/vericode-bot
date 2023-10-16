@@ -41,16 +41,14 @@ module.exports = {
         channelId: interaction.channelId,
       });
       if (
-        doc.data()[`${id}`].event_entries[`${userId}`] !== undefined ||
-        doc.data()[`${id}`].event_entries[`${userId}`] !== null
+        doc.data()[`${id}`].event_entries[`${userId}`] === undefined ||
+        doc.data()[`${id}`].event_entries[`${userId}`] === null
       ) {
-        const isRegAllowed =  verifypostdate(doc.data()[`${id}`].lastDateToRegister);
-        const checkLastEntryDate = verifypostdate(
-          doc.data()[`${id}`]?.event_entries[`${userId}`]?.lastEntryDate
+        const isRegAllowed = verifypostdate(
+          doc.data()[`${id}`].lastDateToRegister
         );
+
         const today = verifypostdate(new Date().getTime());
-        streak_mark = doc.data()[`${id}`]?.event_entries[`${userId}`]?.streak;
-          
         if (
           isRegAllowed.date < today.date &&
           isRegAllowed.month <= today.month &&
@@ -60,7 +58,19 @@ module.exports = {
             content: "Registration is closed",
             ephemeral: true,
           });
-        } else if (
+        }
+      }
+
+      if (
+        doc.data()[`${id}`].event_entries[`${userId}`] !== undefined ||
+        doc.data()[`${id}`].event_entries[`${userId}`] !== null
+      ) {
+        const checkLastEntryDate = verifypostdate(
+          doc.data()[`${id}`]?.event_entries[`${userId}`]?.lastEntryDate
+        );
+        const today = verifypostdate(new Date().getTime());
+        streak_mark = doc.data()[`${id}`]?.event_entries[`${userId}`]?.streak;
+        if (
           today.date == checkLastEntryDate.date &&
           today.month == checkLastEntryDate.month &&
           today.year == checkLastEntryDate.year
