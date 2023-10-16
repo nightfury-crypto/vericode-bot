@@ -28,6 +28,9 @@ module.exports = {
     let eventEndDate = "";
     let lastDateToRegister = "";
     let tags = "";
+    let event_entries = [];
+    let isSocial = false;
+    let event_Id  = "";
     const channelname = interaction.options.getChannel("channel_name");
     const channelToMention = channelMention(channelname).slice(2, -1);
     const modalDatafetch = await db
@@ -59,6 +62,9 @@ module.exports = {
       eventEndDate = getDateforModal(store.endDate);
       lastDateToRegister = getDateforModal(store.lastDateToRegister);
       tags = store.tags;
+      event_entries = store.event_entries;
+      isSocial = store.isSocial;
+      event_Id = store.event_Id;
     }
     const getModalData = await create_event_modal({
       userId: interaction.user.id,
@@ -119,6 +125,9 @@ module.exports = {
               endDate: eventEndDate,
               eventName: event_Name,
               lastDateToRegister: lastDateToRegister,
+              event_Id: event_Id,
+              isSocial: isSocial,
+              event_entries: event_entries,
               tags: tags,
               event_createdAt: FieldValue.serverTimestamp(),
             });
@@ -126,7 +135,6 @@ module.exports = {
               content: `event updated in ${channelToMention}`,
               ephemeral: true,
             });
-         
         }
       })
       .catch((err) => {
@@ -144,6 +152,9 @@ const createEvent = async ({
   eventName,
   tags,
   lastDateToRegister,
+  isSocial,
+  event_entries,
+  event_Id,
 }) => {
   // read db data from firestore
   const docRef = db.collection("events").doc(guildId);
@@ -154,12 +165,13 @@ const createEvent = async ({
       .doc(guildId)
       .update({
         [`${channelId}`]: {
-          event_Id: channelId,
+          event_Id: event_Id,
           startDate: startDate,
           lastDateToRegister: lastDateToRegister,
           endDate: endDate,
           eventName: eventName,
-          event_entries: [],
+          event_entries: event_entries,
+          isSocial: isSocial,
           tags: tags,
           created_at: Timestamp.fromDate(new Date()),
         },
@@ -176,12 +188,13 @@ const createEvent = async ({
       .doc(guildId)
       .set({
         [`${channelId}`]: {
-          event_Id: channelId,
+          event_Id: event_Id,
           startDate: startDate,
           lastDateToRegister: lastDateToRegister,
           endDate: endDate,
           eventName: eventName,
-          event_entries: [],
+          event_entries: event_entries,
+          isSocial: isSocial,
           tags: tags,
           created_at: Timestamp.fromDate(new Date()),
         },

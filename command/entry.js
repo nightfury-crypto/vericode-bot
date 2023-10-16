@@ -44,17 +44,17 @@ module.exports = {
         doc.data()[`${id}`].event_entries[`${userId}`] !== undefined ||
         doc.data()[`${id}`].event_entries[`${userId}`] !== null
       ) {
-        const isRegAllowed = doc.data()[`${id}`].lastDateToRegister;
+        const isRegAllowed =  verifypostdate(doc.data()[`${id}`].lastDateToRegister);
         const checkLastEntryDate = verifypostdate(
           doc.data()[`${id}`]?.event_entries[`${userId}`]?.lastEntryDate
         );
         const today = verifypostdate(new Date().getTime());
         streak_mark = doc.data()[`${id}`]?.event_entries[`${userId}`]?.streak;
-
+          
         if (
-          isRegAllowed.date >= today.date &&
-          isRegAllowed.month >= today.month &&
-          isRegAllowed.year >= today.year
+          isRegAllowed.date < today.date &&
+          isRegAllowed.month <= today.month &&
+          isRegAllowed.year <= today.year
         ) {
           return await interaction.editReply({
             content: "Registration is closed",

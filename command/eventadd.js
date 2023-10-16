@@ -2,12 +2,7 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   channelMention,
-  ModalBuilder,
-  TextInputStyle,
-  TextInputBuilder,
-  ActionRowBuilder,
 } = require("discord.js");
-const { client } = require("../constants/allintents");
 const db = require("../constants/firebase-setup");
 const { FieldValue, Timestamp } = require("firebase-admin").firestore;
 const { getChannelsfromDoc } = require("../functions/firefunc");
