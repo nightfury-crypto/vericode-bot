@@ -99,7 +99,12 @@ module.exports = {
           ) || null;
         tags =
           (await modalinteraction.fields.getTextInputValue("tags_id")) || "";
-        if (
+          if ( lastDateToRegister < eventStartDate || lastDateToRegister > eventEndDate) {
+            return await modalinteraction.editReply({
+              content: "Last date to register can be between event start date and event end date",
+              ephemeral: true,
+            });
+          } else if (
           eventStartDate === null ||
           eventEndDate === null ||
           lastDateToRegister === null ||
@@ -224,3 +229,7 @@ const getDateforModal = (date) => {
     return toshow;
 }
 
+const verifypostdate = (d) => {
+  const ds = new Date(d);
+  return { date: ds.getDate(), month: ds.getMonth(), year: ds.getFullYear() };
+};

@@ -27,7 +27,7 @@ module.exports = {
       channelId: channel.id,
     });
     if (data !== null) {
-      const event_total_days = calculateDate(data.startDate, data.endDate);
+      const event_total_days = calculateDate(data.lastDateToRegister, data.endDate);
       if (Object.keys(data?.event_entries).length > 0) {
         for (const userId in data.event_entries) {  
           const entry = data.event_entries[userId];
@@ -35,7 +35,7 @@ module.exports = {
             `'${userId}`,
             entry.username,
             entry.streak,
-            entry.streak == event_total_days ? "eligible" : "not eligible",
+            entry.streak >= event_total_days ? "eligible" : "not eligible",
             false,
           ];
           csvData += rowData.join(",") + "\n";
